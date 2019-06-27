@@ -1,4 +1,4 @@
-# Combinative
+![Combinative](https://github.com/noppefoxwolf/Combinative/blob/master/Resource/Logo.png)
 
 ## Description
 
