@@ -6,6 +6,7 @@
 //  Copyright © 2019 noppelab. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -176,3 +177,4 @@ extension Notification.Name {
     self.init(rawValue: "\(event)")
   }
 }
+#endif

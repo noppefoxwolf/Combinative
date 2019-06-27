@@ -6,8 +6,6 @@
 //  Copyright © 2019 noppelab. All rights reserved.
 //
 
-import UIKit
-
 public protocol CombinativeCompatible {
   associatedtype CompatibleType
   var cmb: CompatibleType { get }
