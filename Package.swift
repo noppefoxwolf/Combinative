@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
     name: "Combinative",
+    platforms: [
+      .iOS(SupportedPlatform.IOSVersion.v13)
+    ],
     products: [
         .library(
             name: "Combinative",
