@@ -1,4 +1,4 @@
-# Combinative
+![Combinative](https://github.com/noppefoxwolf/Combinative/blob/master/Resource/Logo.png)
 
 ## Description
 
@@ -16,6 +16,14 @@ button.cmb.tap.sink { (button) in
   // do something
 }
 ```
+
+## Requirements
+
+Xcode Beta 11.0
+
+Swift 5.1
+
+iOS13+
 
 ## Installation
 
