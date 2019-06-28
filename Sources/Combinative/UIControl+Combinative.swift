@@ -10,7 +10,6 @@
 import UIKit
 import Combine
 
-//pubilcにしたい
 extension UIControl: CombinativeCompatible { }
 
 public extension Combinative where Base: UIControl {
@@ -21,7 +20,7 @@ public extension Combinative where Base: UIControl {
 
 public extension Combinative where Base: UIButton {
   var tap: UIControl.Publisher<Base> {
-    publisher(for: .touchUpInside)
+    publisher(for: .primaryActionTriggered)
   }
 }
 
@@ -34,6 +33,24 @@ public extension Combinative where Base: UISlider {
 public extension Combinative where Base: UISwitch {
   var isOn: UIControl.Publisher<Base> {
     publisher(for: .valueChanged)
+  }
+}
+
+public extension Combinative where Base: UITextField {
+  var text: UITextField.TextPublisher<Base> {
+    UITextField.TextPublisher(control: base)
+  }
+  
+  var editingEnd: UIControl.Publisher<Base> {
+    publisher(for: .editingDidEnd)
+  }
+  
+  var editingBegan: UIControl.Publisher<Base> {
+    publisher(for: .editingDidBegin)
+  }
+  
+  var `return`: UIControl.Publisher<Base> {
+    publisher(for: .editingDidEndOnExit)
   }
 }
 
@@ -54,15 +71,32 @@ public extension UIControl {
       guard let selector = control.selector(for: event) else { return }
       control.removeTarget(control, action: selector, for: event)
       control.addTarget(control, action: selector, for: event)
-      NotificationCenter.default.publisher(for: Notification.Name(for: event), object: control).compactMap({ $0.object as? T }).receive(subscriber: subscriber)
+      NotificationCenter.combinative.publisher(for: Notification.Name(for: event), object: control).compactMap({ $0.object as? T }).receive(subscriber: subscriber)
+    }
+  }
+}
+
+public extension UITextField {
+  struct TextPublisher<T: UITextField>: Combine.Publisher {
+    public typealias Output = String
+    public typealias Failure = Never
+    let control: T
+    
+    init(control: T) {
+      self.control = control
+    }
+    
+    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+      Publisher(control: control, event: .editingChanged)
+        .compactMap({ $0.text })
+        .receive(subscriber: subscriber)
     }
   }
 }
 
 extension UIControl {
   private func trigger(_ sender: UIControl, _ event: UIEvent?, for type: UIControl.Event) {
-    let nc = NotificationCenter.default
-    nc.post(name: Notification.Name(for: type), object: self, userInfo: nil)
+    NotificationCenter.combinative.post(name: Notification.Name(for: type), object: self, userInfo: nil)
   }
   
   @objc private func touchDown(sender: UIControl, event: UIEvent?) {
@@ -128,50 +162,56 @@ extension UIControl {
   
   private func selector(for event: UIControl.Event) -> Selector? {
     switch event {
-    case UIControl.Event.touchDown:
+    case .touchDown:
       return #selector(touchDown(sender:event:))
-    case UIControl.Event.touchDownRepeat:
+    case .touchDownRepeat:
       return #selector(touchDownRepeat(sender:event:))
-    case UIControl.Event.touchDragInside:
+    case .touchDragInside:
       return #selector(touchDragInside(sender:event:))
-    case UIControl.Event.touchDragOutside:
+    case .touchDragOutside:
       return #selector(touchDragOutside(sender:event:))
-    case UIControl.Event.touchDragEnter:
+    case .touchDragEnter:
       return #selector(touchDragEnter(sender:event:))
-    case UIControl.Event.touchDragExit:
+    case .touchDragExit:
       return #selector(touchDragExit(sender:event:))
-    case UIControl.Event.touchUpInside:
+    case .touchUpInside:
       return #selector(touchUpInside(sender:event:))
-    case UIControl.Event.touchUpOutside:
+    case .touchUpOutside:
       return #selector(touchUpOutside(sender:event:))
-    case UIControl.Event.touchCancel:
+    case .touchCancel:
       return #selector(touchCancel(sender:event:))
-    case UIControl.Event.valueChanged:
+    case .valueChanged:
       return #selector(valueChanged(sender:event:))
-    case UIControl.Event.primaryActionTriggered:
+    case .primaryActionTriggered:
       return #selector(primaryActionTriggered(sender:event:))
-    case UIControl.Event.editingDidBegin:
+    case .editingDidBegin:
       return #selector(editingDidBegin(sender:event:))
-    case UIControl.Event.editingChanged:
+    case .editingChanged:
       return #selector(editingChanged(sender:event:))
-    case UIControl.Event.editingDidEnd:
+    case .editingDidEnd:
       return #selector(editingDidEnd(sender:event:))
-    case UIControl.Event.editingDidEndOnExit:
+    case .editingDidEndOnExit:
       return #selector(editingDidEndOnExit(sender:event:))
-    case UIControl.Event.allTouchEvents:
+    case .allTouchEvents:
       return #selector(allTouchEvents(sender:event:))
-    case UIControl.Event.allEditingEvents:
+    case .allEditingEvents:
       return #selector(allEditingEvents(sender:event:))
-    case UIControl.Event.applicationReserved:
+    case .applicationReserved:
       return #selector(applicationReserved(sender:event:))
-    case UIControl.Event.systemReserved:
+    case .systemReserved:
       return #selector(systemReserved(sender:event:))
-    case UIControl.Event.allEvents:
+    case .allEvents:
       return #selector(allEvents(sender:event:))
     default:
       return nil
     }
   }
+}
+#endif
+
+#if canImport(Foundation)
+extension NotificationCenter {
+  static let combinative: NotificationCenter = .init()
 }
 
 extension Notification.Name {
