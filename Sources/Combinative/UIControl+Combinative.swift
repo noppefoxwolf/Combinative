@@ -31,6 +31,12 @@ public extension Combinative where Base: UISlider {
   }
 }
 
+public extension Combinative where Base: UISwitch {
+  var isOn: UIControl.Publisher<Base> {
+    publisher(for: .valueChanged)
+  }
+}
+
 // ===============================================
 
 public extension UIControl {
@@ -48,11 +54,7 @@ public extension UIControl {
       guard let selector = control.selector(for: event) else { return }
       control.removeTarget(control, action: selector, for: event)
       control.addTarget(control, action: selector, for: event)
-      NotificationCenter.default.publisher(for: notificationName(for: event), object: control).compactMap({ $0.object as? T }).receive(subscriber: subscriber)
-    }
-    
-    private func notificationName(for event: Event) -> Notification.Name {
-      Notification.Name(for: event)
+      NotificationCenter.default.publisher(for: Notification.Name(for: event), object: control).compactMap({ $0.object as? T }).receive(subscriber: subscriber)
     }
   }
 }
@@ -174,7 +176,7 @@ extension UIControl {
 
 extension Notification.Name {
   init(for event: UIControl.Event) {
-    self.init(rawValue: "\(event)")
+    self.init(rawValue: "UIControl.Event.\(event).Combinative")
   }
 }
 #endif
