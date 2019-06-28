@@ -17,6 +17,14 @@ button.cmb.tap.sink { (button) in
 }
 ```
 
+## Requirements
+
+Xcode Beta 11.0
+
+Swift 5.1
+
+iOS13+
+
 ## Installation
 
 ### Swift Package Manager
