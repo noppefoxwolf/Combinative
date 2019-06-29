@@ -10,10 +10,20 @@ And, You can use great apple's combine operators with UIKit.
 
 ### UIButton
 
-```
+```swift
 let button = UIButton()
 button.cmb.tap.sink { (button) in
   // do something
+}
+```
+
+### UITextField
+
+```swift
+@IBOutlet weak var textField: UITextField!
+
+textField.cmb.text.sink { (text) in
+  print(text)
 }
 ```
 
