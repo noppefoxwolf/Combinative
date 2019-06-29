@@ -9,11 +9,11 @@
 import UIKit
 import Combine
 
-extension UITapGestureRecognizer: CombinativeCompatible { }
+extension UIGestureRecognizer: CombinativeCompatible { }
 
-public extension Combinative where Base: UITapGestureRecognizer {
-  var event: UITapGestureRecognizer.Publisher<Base> {
-    UITapGestureRecognizer.Publisher(gesture: base)
+public extension Combinative where Base: UIGestureRecognizer {
+  var event: UIGestureRecognizer.Publisher<Base> {
+    UIGestureRecognizer.Publisher(gesture: base)
   }
 }
 #endif
