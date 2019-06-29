@@ -25,20 +25,20 @@ public extension Combinative where Base: UIButton {
 }
 
 public extension Combinative where Base: UISlider {
-  var value: UIControl.Publisher<Base> {
-    publisher(for: .valueChanged)
+  var value: Publishers.CompactMap<UIControl.Publisher<Base>, Float> {
+    publisher(for: .valueChanged).compactMap({ $0.value })
   }
 }
 
 public extension Combinative where Base: UISwitch {
-  var isOn: UIControl.Publisher<Base> {
-    publisher(for: .valueChanged)
+  var isOn: Publishers.CompactMap<UIControl.Publisher<Base>, Bool> {
+    publisher(for: .valueChanged).compactMap({ $0.isOn })
   }
 }
 
 public extension Combinative where Base: UITextField {
-  var text: UITextField.TextPublisher<Base> {
-    UITextField.TextPublisher(control: base)
+  var text: Publishers.CompactMap<UIControl.Publisher<Base>, String> {
+    publisher(for: .editingChanged).compactMap({ $0.text ?? "" })
   }
   
   var editingEnd: UIControl.Publisher<Base> {
@@ -54,169 +54,28 @@ public extension Combinative where Base: UITextField {
   }
 }
 
-// ===============================================
-
-public extension UIControl {
-  struct Publisher<T: UIControl>: Combine.Publisher {
-    public typealias Output = T
-    public typealias Failure = Never
-    let control: T
-    let event: UIControl.Event
-    init(control: T, event: UIControl.Event) {
-      self.control = control
-      self.event = event
-    }
-    
-    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-      guard let selector = control.selector(for: event) else { return }
-      control.removeTarget(control, action: selector, for: event)
-      control.addTarget(control, action: selector, for: event)
-      NotificationCenter.combinative.publisher(for: Notification.Name(for: event), object: control).compactMap({ $0.object as? T }).receive(subscriber: subscriber)
-    }
+public extension Combinative where Base: UISegmentedControl {
+  var segmentIndex: Publishers.CompactMap<UIControl.Publisher<Base>, Int> {
+    publisher(for: .valueChanged).compactMap({ $0.selectedSegmentIndex })
   }
 }
 
-public extension UITextField {
-  struct TextPublisher<T: UITextField>: Combine.Publisher {
-    public typealias Output = String
-    public typealias Failure = Never
-    let control: T
-    
-    init(control: T) {
-      self.control = control
-    }
-    
-    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-      Publisher(control: control, event: .editingChanged)
-        .compactMap({ $0.text })
-        .receive(subscriber: subscriber)
-    }
+public extension Combinative where Base: UIStepper {
+  var value: Publishers.CompactMap<UIControl.Publisher<Base>, Double> {
+    publisher(for: .valueChanged).compactMap({ $0.value })
   }
 }
 
-extension UIControl {
-  private func trigger(_ sender: UIControl, _ event: UIEvent?, for type: UIControl.Event) {
-    NotificationCenter.combinative.post(name: Notification.Name(for: type), object: self, userInfo: nil)
+public extension Combinative where Base: UIPageControl {
+  var page: Publishers.CompactMap<UIControl.Publisher<Base>, Int> {
+    publisher(for: .valueChanged).compactMap({ $0.currentPage })
   }
-  
-  @objc private func touchDown(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDown)
-  }
-  @objc private func touchDownRepeat(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDownRepeat)
-  }
-  @objc private func touchDragInside(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDragInside)
-  }
-  @objc private func touchDragOutside(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDragOutside)
-  }
-  @objc private func touchDragEnter(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDragEnter)
-  }
-  @objc private func touchDragExit(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchDragExit)
-  }
-  @objc private func touchUpInside(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchUpInside)
-  }
-  @objc private func touchUpOutside(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchUpOutside)
-  }
-  @objc private func touchCancel(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .touchCancel)
-  }
-  @objc private func valueChanged(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .valueChanged)
-  }
-  @objc private func primaryActionTriggered(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .primaryActionTriggered)
-  }
-  @objc private func editingDidBegin(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .editingDidBegin)
-  }
-  @objc private func editingChanged(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .editingChanged)
-  }
-  @objc private func editingDidEnd(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .editingDidEnd)
-  }
-  @objc private func editingDidEndOnExit(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .editingDidEndOnExit)
-  }
-  @objc private func allTouchEvents(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .allTouchEvents)
-  }
-  @objc private func allEditingEvents(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .allEditingEvents)
-  }
-  @objc private func applicationReserved(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .applicationReserved)
-  }
-  @objc private func systemReserved(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .systemReserved)
-  }
-  @objc private func allEvents(sender: UIControl, event: UIEvent?) {
-    trigger(sender, event, for: .allEvents)
-  }
-  
-  private func selector(for event: UIControl.Event) -> Selector? {
-    switch event {
-    case .touchDown:
-      return #selector(touchDown(sender:event:))
-    case .touchDownRepeat:
-      return #selector(touchDownRepeat(sender:event:))
-    case .touchDragInside:
-      return #selector(touchDragInside(sender:event:))
-    case .touchDragOutside:
-      return #selector(touchDragOutside(sender:event:))
-    case .touchDragEnter:
-      return #selector(touchDragEnter(sender:event:))
-    case .touchDragExit:
-      return #selector(touchDragExit(sender:event:))
-    case .touchUpInside:
-      return #selector(touchUpInside(sender:event:))
-    case .touchUpOutside:
-      return #selector(touchUpOutside(sender:event:))
-    case .touchCancel:
-      return #selector(touchCancel(sender:event:))
-    case .valueChanged:
-      return #selector(valueChanged(sender:event:))
-    case .primaryActionTriggered:
-      return #selector(primaryActionTriggered(sender:event:))
-    case .editingDidBegin:
-      return #selector(editingDidBegin(sender:event:))
-    case .editingChanged:
-      return #selector(editingChanged(sender:event:))
-    case .editingDidEnd:
-      return #selector(editingDidEnd(sender:event:))
-    case .editingDidEndOnExit:
-      return #selector(editingDidEndOnExit(sender:event:))
-    case .allTouchEvents:
-      return #selector(allTouchEvents(sender:event:))
-    case .allEditingEvents:
-      return #selector(allEditingEvents(sender:event:))
-    case .applicationReserved:
-      return #selector(applicationReserved(sender:event:))
-    case .systemReserved:
-      return #selector(systemReserved(sender:event:))
-    case .allEvents:
-      return #selector(allEvents(sender:event:))
-    default:
-      return nil
-    }
-  }
-}
-#endif
-
-#if canImport(Foundation)
-extension NotificationCenter {
-  static let combinative: NotificationCenter = .init()
 }
 
-extension Notification.Name {
-  init(for event: UIControl.Event) {
-    self.init(rawValue: "UIControl.Event.\(event).Combinative")
+public extension Combinative where Base: UIDatePicker {
+  var page: Publishers.CompactMap<UIControl.Publisher<Base>, Date> {
+    publisher(for: .valueChanged).compactMap({ $0.date })
   }
 }
+
 #endif
