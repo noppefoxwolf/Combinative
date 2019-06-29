@@ -2,7 +2,7 @@
 //  File.swift
 //  
 //
-//  Created by beta on 2019/06/29.
+//  Created by noppe on 2019/06/29.
 //
 
 #if canImport(UIKit)

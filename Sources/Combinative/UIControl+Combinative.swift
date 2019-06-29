@@ -2,7 +2,7 @@
 //  UIControl+Combinative.swift
 //  a
 //
-//  Created by beta on 2019/06/27.
+//  Created by noppe on 2019/06/27.
 //  Copyright © 2019 noppelab. All rights reserved.
 //
 
