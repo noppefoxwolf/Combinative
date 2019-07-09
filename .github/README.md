@@ -1,4 +1,4 @@
-![Combinative](https://github.com/noppefoxwolf/Combinative/blob/master/Resource/Logo.png)
+![Combinative](https://github.com/noppefoxwolf/Combinative/blob/master/.github/Resource/Logo.png)
 
 ## Description
 
@@ -56,9 +56,9 @@ let package = Package(
 
 ## Contributing
 
-We would love you to contribute to **Combinative**, check the [CONTRIBUTING](https://github.com/noppefoxwolf/Combinative/blob/master/CONTRIBUTING.md) file for more info.
+We would love you to contribute to **Combinative**, check the [CONTRIBUTING](https://github.com/noppefoxwolf/Combinative/blob/master/.github/CONTRIBUTING.md) file for more info.
 
 
 ## License
 
-**Combinative** is available under the MIT license. See the [LICENSE](https://github.com/noppefoxwolf/Combinative/blob/master/LICENSE.md) file for more info.
+**Combinative** is available under the MIT license. See the [LICENSE](https://github.com/noppefoxwolf/Combinative/blob/master/.github/LICENSE.md) file for more info.
