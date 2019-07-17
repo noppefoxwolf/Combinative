@@ -2,9 +2,9 @@
 
 ## Description
 
-**Combinative** is library for UI event handling using Apple's combine framework.
-It not need some big dependencies because using built in framework.
-And, You can use great apple's combine operators with UIKit.
+**Combinative** is a library for UI event handling using Apple's combine framework.
+It doesn't need many dependencies because it is written mainly using built-in framework.
+By using this library, You can use great apple's combine-framework operators with UIKit.
 
 ## Usage
 
