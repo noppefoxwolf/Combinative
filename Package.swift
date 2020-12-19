@@ -1,10 +1,10 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 import PackageDescription
 
 let package = Package(
     name: "Combinative",
     platforms: [
-      .iOS(SupportedPlatform.IOSVersion.v13)
+      .iOS(.v13)
     ],
     products: [
         .library(

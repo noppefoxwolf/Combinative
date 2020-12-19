@@ -8,30 +8,20 @@ By using this library, You can use great apple's combine-framework operators wit
 
 ## Usage
 
-### UIButton
+### UIControl
 
 ```swift
 let button = UIButton()
-button.cmb.tap.sink { (button) in
-  // do something
-}
-```
+button.publisher(event: .touchUpInside).sink {
 
-### UITextField
-
-```swift
-@IBOutlet weak var textField: UITextField!
-
-textField.cmb.text.sink { (text) in
-  print(text)
 }
 ```
 
 ## Requirements
 
-Xcode Beta 11.0
+Xcode 11.0
 
-Swift 5.1
+Swift 5.2
 
 iOS13+
 
@@ -45,7 +35,7 @@ it, simply add the following line to your Package.swift:
 ```swift
 let package = Package(
   dependencies: [
-    .package(url: "https://github.com/noppefoxwolf/Combinative.git", branch: "master"),
+    .package(url: "https://github.com/noppefoxwolf/Combinative.git", version: "1.0.0"),
   ],
 )
 ```
